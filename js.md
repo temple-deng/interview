@@ -1430,3 +1430,86 @@ word-break: normal | keep-all | break-all
 
 + normal：行只能在允许断行点进行断行
 + break-word：如果行中没有其他可接受的断点，则可以在任意处进行断行。
+
+
+
+## MV*
+
+在开发应用程序的时候，以求更好的管理应用程序的复杂性，基于 **职责分离（Speration of Duties）**
+的思想都会对应用程序进行分层。在开发图形界面应用程序的时候，会把管理用户界面的层次称为View，
+应用程序的数据为Model（注意这里的Model指的是Domain Model，这个应用程序对需要解决的问题的
+数据抽象，不包含应用的状态，可以简单理解为对象）。Model提供数据操作的接口，执行相应的业务逻辑。    
+
+有了View和Model的分层，那么问题就来了：View如何同步Model的变更，View和Model之间如何粘合在一起。    
+
+### Smalltalk-80 MVC
+
+MVC出了把应用程序分成View、Model层，还额外的加了一个Controller层，它的职责为进行Model和
+View之间的协作（路由、输入预处理等）的应用逻辑（application logic）；Model进行处理业务逻辑。
+Model、View、Controller三个层次的依赖关系如下：    
+
+![mvc1](https://raw.githubusercontent.com/temple-deng/markdown-images/master/uncategorized/mvc1.png)   
+
+用户对 View 操作以后，View 捕获到这个操作，会把处理的权利交移给 Controller（Pass calls）；Controller 会对来自 View 数据进行预处理、决定调用哪个 Model 的接口；然后由 Model 执行相关
+的业务逻辑；当 Model 变更了以后，会通过 **观察者模式**（Observer Pattern）通知 View；
+View 通过观察者模式收到Model变更的消息以后，会向Model请求最新的数据，然后重新更新界面。如下图：   
+
+![mvc2](https://raw.githubusercontent.com/temple-deng/markdown-images/master/uncategorized/mvc2.png)   
+
+### MVC Model2
+
+在Web服务端开发的时候也会接触到MVC模式，而这种MVC模式不能严格称为MVC模式。经典的MVC模式只是解决客户端图形界面应用程序的问题，而对服务端无效。服务端的MVC模式又自己特定的名字：MVC Model 2，或者叫JSP Model 2，或者直接就是Model 2 。Model 2客户端服务端的交互模式如下：
+
+![mvc3](https://raw.githubusercontent.com/temple-deng/markdown-images/master/uncategorized/mvc3.png)   
+
+服务端接收到来自客户端的请求，服务端通过路由规则把这个请求交由给特定的Controller进行处理，
+Controller执行相应的应用逻辑，对Model进行操作，Model执行业务逻辑以后；然后用数据去渲染特定
+的模版，返回给客户端。   
+
+因为HTTP协议是单工协议并且是无状态的，服务器无法直接给客户端推送数据。除非客户端再次发起请求，
+否则服务器端的Model的变更就无法告知客户端。所以可以看到经典的Smalltalk-80 MVC中Model通过
+观察者模式告知View更新这一环被无情地打破，不能称为严格的MVC。    
+
+### MVP
+
+MVP模式把MVC模式中的Controller换成了Presenter。MVP层次之间的依赖关系如下：   
+
+![mvc4](https://raw.githubusercontent.com/temple-deng/markdown-images/master/uncategorized/mvc4.png)   
+
+既然View对Model的依赖被打破了，那View如何同步Model的变更？看看MVP的调用关系：   
+
+![mvc5](https://raw.githubusercontent.com/temple-deng/markdown-images/master/uncategorized/mvc5.png)   
+
+和MVC模式一样，用户对 View 的操作都会从 View 交移给 Presenter。Presenter 会执行相应的应用
+程序逻辑，并且对 Model 进行相应的操作；而这时候 Model 执行完业务逻辑以后，也是通过观察者模式
+把自己变更的消息传递出去，但是是传给 Presenter 而不是 View。Presenter获取到Model变更的
+消息以后，通过View提供的接口更新界面。    
+
+MVP 的优点：   
+
+1. 便于测试。Presenter对View是通过接口进行，在对Presenter进行不依赖UI环境的单元测试的时候。
+可以通过Mock一个View对象，这个对象只需要实现了View的接口即可。然后依赖注入到Presenter中，
+单元测试的时候就可以完整的测试Presenter应用逻辑的正确性。
+2. View可以进行组件化。在MVP当中，View不依赖Model。这样就可以让View从特定的业务场景中脱离出来，可以说View可以做到对业务完全无知。它只需要提供一系列接口提供给上层操作。这样就可以做到高度可复用的View组件。   
+
+### MVVM
+
+MVVM可以看作是一种特殊的MVP（Passive View）模式，或者说是对MVP模式的一种改良。
+
+MVVM代表的是 Model-View-ViewModel，这里需要解释一下什么是 ViewModel。ViewModel的含义
+就是 "Model of View"，视图的模型。它的含义包含了领域模型（Domain Model）和视图的状态（State）。
+在图形界面应用程序当中，界面所提供的信息可能不仅仅包含应用程序的领域模型。还可能包含一些领域模型
+不包含的视图状态，例如电子表格程序上需要显示当前排序的状态是顺序的还是逆序的，而这是Domain Model
+所不包含的，但也是需要显示的信息。    
+
+可以简单把ViewModel理解为页面上所显示内容的数据抽象，和Domain Model不一样，ViewModel更适合
+用来描述View。   
+
+![mvc6](https://raw.githubusercontent.com/temple-deng/markdown-images/master/uncategorized/mvc6.png)   
+
+MVVM 的调用关系和 MVP 一样。但是，在 ViewModel 当中会有一个叫 Binder，或者是Data-binding
+engine的东西。以前全部由 Presenter 负责的 View 和 Model 之间数据同步操作交由给 Binder
+处理。你只需要在 View 的模版语法当中，指令式地声明 View 上的显示的内容是和 Model 的哪一块
+数据绑定的。当 ViewModel 对进行 Model 更新的时候，Binder 会自动把数据更新到 View 上去，
+当用户对 View 进行操作（例如表单输入），Binder 也会自动把数据更新到 Model 上去。这种方式称为：
+Two-way data-binding，双向数据绑定。可以简单而不恰当地理解为一个模版引擎，但是会根据数据变更实时渲染。    
