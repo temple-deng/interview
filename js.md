@@ -82,7 +82,7 @@ y     // 解析成 x; ++y
  1 | "1" | - | true | new Number(1)      
 
 12. Number 类定义的 `toString()` 方法可以接收表示转换基数的可选参数。范围是 2~36。
-13. `toFixed()` 根据小数点后的指定位数将数字转换为字符串，`toExponentital()` 使用指数
+13. `toFixed()` 根据小数点后的指定位数将数字转换为字符串，`toExponential()` 使用指数
 计数法将数字转换为指数形式的字符串，其中小数点前一位，小数点后的位数由参数指定，`toPrecision()`
 根据指定的有效数字位数将数字转换为字符串。如果有效数字的位数少于数字整数部分的位数，则转换成指数
 形式。
@@ -125,7 +125,7 @@ y     // 解析成 x; ++y
 
 4. 属性访问表达式和调用表达式比表中所有的运算符优先级都要高。
 5. 求余运算符的操作数通常是整数，但也适用于浮点数，6.5 % 2.1 = 0.2
-6. 为运算符首先将操作数转换为数字，并将数字强制表示为 32 位整型，这会忽略原格式中的小数部分和
+6. 位运算符首先将操作数转换为数字，并将数字强制表示为 32 位整型，这会忽略原格式中的小数部分和
 任何超过 32 位的二进制位。移位运算符要求右操作数在 0~31 之间。位运算符会将 NaN, Infinity 和
 -Infinity 都转换为 0.
 7. 关系表达式的运算结果总是为 true 或 false，关系运算符，包括比较运算符、相等和不等运算符、in
@@ -180,7 +180,7 @@ undefined，JS 会跳过循环并执行后续的代码，也有部分实现可�
 ### 6 对象
 
 1. 属性名可以是空字符串
-2. 创建对象的三种方面：直接量、构造函数和 `Object.create()` 方法
+2. 创建对象的三种方法：直接量、构造函数和 `Object.create()` 方法
 3. 属性赋值失败的场景：
   + 属性 p 是只读的（无论是继承的还是自有的）
   + o 中不存在自有属性 p：o 没有使用 setter 方法继承属性 p，并且 o 的可扩展性是 false。
@@ -302,8 +302,8 @@ if (!Function.prototype.bind) {
   - {n,}
   - {n}
   - ? 等价于 {0,1}
-  - + 等价于 {1,}
-  - * 等价于 {0, }
+  - \+ 等价于 {1,}
+  - \* 等价于 {0, }
 7. 在使用 * 和 ? 时要注意，由于这些字符可能匹配 0 个字符，因此它们允许什么都不匹配。
 8. 非贪婪匹配，在待匹配的字符后面跟一个问号 +?, ??, *?, {1,5}?
 9. 使用 /a+?b/ 匹配 "aaab" 时仍然会匹配整个字符串，因为正则表达式的模式匹配总会寻找字符串中的
@@ -401,7 +401,7 @@ name 的情况下可能会返回类数组对象（到底一个的时候是返回
 一个新的、未命名的窗口，注意是未命名的。第四个是布尔值，只有在第二个参数命名的是一个已存在的窗口
 时才有用，声明是要替换历史（true）还是新建条目（false，默认值）
 13. Window 对象如果有 name 属性，就用它保存名字。该属性是可写的，并且脚本可以随意设置它。如果
-传递给 `window.open` 一个除 '_blank'` 之外的名字，通过该调用创建的窗口将以该名字作为 name
+传递给 `window.open` 一个除 '_blank' 之外的名字，通过该调用创建的窗口将以该名字作为 name
 属性的初始值。如果 `<iframe>` 元素有 name 属性，表示该 iframe 的 Window 对象会用它作为
 name 属性的初始值。
 14. `window.opener` 属性, `window.close()`, `window.closed`
@@ -596,7 +596,7 @@ false。
 4. `setItem(), getItem(), removeItem(), clear(), length, key()` key() 方法传入
 0～length-1 的数字，可以枚举所有存储数据的名字。
 5. 无论什么时候存储在 localStorage 或 sessionStorage 的数据发生改变，浏览器都会在其他对
-该数据可见的窗口对象上触发存储时间（不过，在对数据进行改变的窗口对象上是不会触发的）
+该数据可见的窗口对象上触发存储事件（不过，在对数据进行改变的窗口对象上是不会触发的）
 6. 还要注意的是，只有当存储数据真正发生改变的时候才会触发存储事件。像给已经存在的存储项设置一个
 一模一样的值，抑或是删除一个本来就不存在的存储项都是不会触发存储事件的。
 7. window.onstorage 事件，事件对象相关属性：
@@ -843,11 +843,11 @@ new Date(year, month, day, hour, minute, sec, ms)
   - 代码执行阶段：完成变量赋值，函数引用  
   - 注意根据文章中的意思 EC 是在调用函数时才生成的  
 4. 变量对象的创建，依次经历了以下几个过程
-  1. 建立 arguments 对象。
-  2. 检查当前上下文的函数声明，也就是使用 function 关键字声明的函数。在变量对象中以函数名建立
+  - 建立 arguments 对象。
+  - 检查当前上下文的函数声明，也就是使用 function 关键字声明的函数。在变量对象中以函数名建立
   一个属性，属性值为指向函数所在内存地址的引用。如果函数名的属性已经存在，那么该属性将会被新的
   引用所覆盖
-  3. 检查当前上下文中的变量声明，没找到一个变量声明，就在变量对象中以变量名建立一个属性，属性值
+  - 检查当前上下文中的变量声明，没找到一个变量声明，就在变量对象中以变量名建立一个属性，属性值
   为 undefined。如果该变量名的属性已经存在，为了防止同名的函数被修改为 undefined，则会直接
   跳过，原属性值不会被修改。    
 5. 变量对象 VO 和活动对象 AO 都是同一个对象，只是处于执行上下文的不同生命周期，不过只有处于
@@ -1105,3 +1105,532 @@ engine的东西。以前全部由 Presenter 负责的 View 和 Model 之间数�
 数据绑定的。当 ViewModel 对进行 Model 更新的时候，Binder 会自动把数据更新到 View 上去，
 当用户对 View 进行操作（例如表单输入），Binder 也会自动把数据更新到 Model 上去。这种方式称为：
 Two-way data-binding，双向数据绑定。可以简单而不恰当地理解为一个模版引擎，但是会根据数据变更实时渲染。    
+
+
+## ES6
+
+### let, const, 解构, 字符串, 正则, 数值
+
+1. ES6 引入了块级作用域，明确允许在块级作用域之中声明函数。ES6 规定，块级作用域之中，函数
+声明语句的行为类似于 `let`，在块级作用域之外不可引用。ES6 的块级作用域允许声明函数的规则，
+只在使用大括号的情况下成立，如果没有使用大括号，就会报错。   
+2. `let, const, class` 声明的全局变量，不属于顶层对象的属性。
+3. 本质上，解构赋值属于 “模式匹配”，只要等号两边的模式相同，左边的变量就会被赋予对应的值。    
+
+```js
+let [x, y, ...z] = ['a'];
+x   // "a"
+y   // undefined
+z   // []
+```    
+
+4. 数组解构要求右边是可迭代的解构。
+5. 如果解构赋值的默认值是一个表达式，那么这个表达式是惰性求值的。
+6. 对象的解构赋值：   
+
+```js
+let { foo: baz } = { foo: 'aaa', bar: 'bbb' };
+baz    // "aaa"
+```   
+
+7. 如果解构模式是嵌套的对象，而且子对象所在的父属性不存在，那么将会报错：   
+
+```js
+// 报错
+let {foo: {bar}} = {baz: 'baz'};
+```    
+
+8. 由于数组本质是特殊的对象，因此可以对数组进行对象属性的解构。到底是数组解构还是对象解构
+是取决于等号左边的模式。
+9. `\u{20BB7}`
+10. `codePointAt()`    
+
+```js
+let s = '𠮷a';
+
+s.codePointAt(0)   // 134071
+s.codePointAt(1)   // 57271
+s.codePointAt(2)   // 97
+```    
+
+11. `String.fromCharCode(0x20BB7) // "ஷ"`，`String.fromCharCode` 不能识别大于
+0xFFFF 的码点，所以 0x20BB7 就发生了溢出，最高位 2 被舍弃了，最后返回码点 U+0BB7 的码点。
+12. 解决方法就是 `String.fromCodePoint()` 方法。
+13. `includes(), startsWith(), endsWith(), repeat()`, 如果 `repeat` 的参数是
+负数或者 `Infinity` 报错，但是如果参数是 0 到 -1 之间的小数，则等同于 0，这是因为会先进行
+取整运算。0 到 -1 之间的小数，取整以后等于 -0，NaN 也等同于 0。
+14. `padStart(), padEnd()` 第一个参数用来指定字符串的最小长度，第二个参数是用来补全的字符串。
+如果原字符串的长度，等于或大于指定的最小长度，则返回原字符串。如果省略了第二个参数，默认使用
+空格补全长度。
+15. 模板字符串可以嵌套。
+16. 标签模板：    
+
+```js
+let a = 5;
+let b = 10;
+
+tag`Hello ${a + b} world ${a * b}`;
+// 等同于
+tag(["Hello ", " world ", ""], 15, 50)
+```    
+
+17. `RegExp` 构造函数的一种情况是，第一个参数是一个正则表达式，这时会返回一个原有正则表达
+式的拷贝，此时第二个参数指定的修饰符会覆盖掉原有的正则表达式修饰符。
+18. u 修饰符：   
+
+```js
+/^\uD83D/u.test('\uD83D\uDC2A')   // false
+/^\uD83D/.test('\uD83D\uDC2A')    // true
+```    
+
+19. ES6 新增了使用大括号表示 Unicode 字符，这种表示法在正则表达式中必须加上 u 修饰符，
+才能识别当中的大括号，否则会被解读为量词
+20. `RegExp.prototype.unicode`
+21. `y` 修饰符的作用与 `g` 修饰符类似，也是全局匹配，后一次匹配都从上一次匹配成功的下一个
+位置开始。不同之处在于，`g` 修饰符只要剩余位置中存在匹配就可，而 `y` 修饰符确保匹配必须从
+剩余的第一个位置开始。`RegExp.prototype.sticky`
+22. `RegExp.prototype.flags`
+23. ES2018 引入 `s` 修饰符，使得 `.` 可以匹配任意单个字符,`dotAll`属性
+24. 后行断言，`(?<=), (?<!)`
+25. 具名组匹配：    
+
+```js
+const RE_DATE = /(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})/;
+
+const matchObj = RE_DATE.exec('1999-12-31');
+const year = matchObj.groups.year;   // 1999
+const month = matchObj.groups.month;  // 12
+const day = matchObj.groups.day;    // 31
+```    
+
+具名组匹配在圆括号内部，模式的头部添加 "问号 + 尖括号 + 组名"，然后就可以在 `exec` 方法
+返回结果的 `groups` 属性上引用该组名。   
+
+字符串替换时，使用 `$<组名>` 引用具名组。   
+
+```js
+let re = /(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})/;
+
+'2015-01-02'.replace(re, '$<day>/$<month>/$<year>');
+// '02/01/2015'
+```    
+
+`replace` 方法的第二个参数也可以是函数：   
+
+```js
+'2015-01-02'.replace(re, (
+  matched,    // 整个匹配结果 2015-01-02
+  capture1,   // 第一个组匹配 2015
+  capture2,   // 第二个组匹配 01
+  capture3,   // 第二个组匹配 02
+  position,   // 匹配开始的位置 0
+  S,          // 原字符串 2015-01-02
+  groups      // 具名组构成的一个对象 {year, month, day}
+) => {
+  let {day, month, year} = arguments[arguments.length - 1];
+  return `${day}/${month}/${year}`;
+});
+```   
+
+具名组在原来的基础上，新增了最后一个函数参数：具名组构成的一个对象。    
+
+26. `Number.isFinite(), Number.isNaN()` 与传统的全局方法 `isFinite(), isNaN()`
+的区别在于，传统方法先调用 `Number()` 将非数值转为数值，再进行判断，而这两个新方法只对
+数值有效。
+27. `Number.isInteger()`，如果参数不是数值，返回 `false` 不会进行转换。   
+
+`Number.isInteger(3.0000000000000002)  // true` 这个小数的精度达到了小数点后
+16 个十进制位，转成二进制位超过了 53 个二进制位，导致最后的那个 2 被丢弃了。   
+
+28. `Number.EPSILON, Number.isSafeInteger()`
+29. 指数运算符 `**`，右结合。
+
+### 函数，数组，对象
+
+1. 扩展运算符，操作数是一个数组，只要用于函数调用，将一个数组转为用逗号分隔的参数序列。这个东西
+有点诡异啊，说是运算符，在一些简单的表达式中还不能使用，貌似只能在某些特定的语境下使用。如果扩展
+运算符后面是一个空数组，则不产生任何效果 `[...[], 1] // [1]`，扩展运算符还能正确识别四个
+字节的 Unicode 字符。任何实现了 Iterator 接口的对象，都可以用扩展运算符转为真正的数组。
+2. `Array.from()`, 还可以接受第二个参数，作用类似于数组的 `map` 方法。也可以正确处理 Unicode
+字符。
+3. `Array.of()`
+4. `copyWithin()` 在当前数组内部，将指定位置的成员复制到其他位置，然后返回当前数组。
+5. `find(), findIndex()`, `fill()`
+6. `entries(), keys(), values()` 迭代器对象
+7. `includes()`
+8. `flat(), flatMap()`,返回一个新数组，对源数组无影响。 `flat()` 默认只会“拉平”一层，
+如果想要“拉平”多层的嵌套数组，可以将 `flat()` 方法的参数写成一个整数，表示想要拉平的层数。
+甚至可以使用 Infinity 作为参数。`flatMap()` 对原数组每个成员执行一个函数，然后对返回值
+组成的数组执行 `flat()` 方法，    
+9. 如果对象的方法使用了 getter 和 setter，则 `name` 属性不是在该方法上面，而是在该方法
+的属性描述符的 `get` 和 `set` 属性上面，返回值是方法名前加上 `get` 和 `set`:   
+
+```js
+const obj = {
+  get foo() {},
+  set foo(x) {}
+};
+
+obj.foo.name
+// TypeError: Cannot read property 'name' of undefined
+// 他这个例子有误导性，这里是因为他 foo getter 返回了 undefined，如果我们恰好
+// foo getter 返回一个带有 name 属性的对象，那这里就没问题了
+
+const desctiptor = Object.getOwnPropertyDescriptor(obj, 'foo');
+
+descriptor.get.name  // "get foo"
+descriptor.set.name  // "set foo"
+```   
+
+10. `Object.is()`
+11. `Object.assign()` 合并源对象的所有自身可枚举属性。`Object.assign()` 只能进行值的
+复制，如果要复制的值是一个 getter，那么将求值后再复制（怎么求值）
+12. `Object.getOwnPropertyDescriptors(), Object.setPrototypeOf(obj, proto)`,
+`Object.getPrototypeOf()`
+13. `super` 表示原型对象。只能用在对象的方法中。
+14. `Object.values(), Object.entries()`
+15. 对象的扩展运算符：   
+
+```js
+let {x, y, ...z} = {x: 1, y: 2, a: 3, b: 4};
+x    // 1
+y    // 2
+z    // { a: 3, b: 4 }
+```   
+
+16. 指定了默认值之后，函数的 `length` 属性，将返回没有指定默认值的参数个数，也就是说，指定了
+默认值之后，`length` 属性将失真。同理，rest 参数也不计入。同时，如果设置了默认值的参数不是
+尾参数，那么 `length` 属性也不再计入后面的参数了。
+17. 如果将一个匿名函数赋值给一个变量，ES5 的 `name` 属性，会返回空字符串，而 ES6 的 `name`
+属性会返回实际的函数名。但是如果将一个具名函数赋值给一个变量，则 ES5 和 ES6 的 `name` 属性
+都返回这个具名函数本来的名字。`Function` 构造函数返回的函数实例，`name` 属性的值 `anonymous`。
+`bind` 返回的函数，`name` 属性会加上 `bound ` 前缀
+
+### Symbol, Set, Map, Proxy, Reflect, Promise
+
+1. Symbol 值通过 `Symbol` 函数生成。`Symbol` 函数前不能使用 new 命令，否则会报错，
+这是因为生成的 Symbol 是一个原始类型的值，不是对象。   
+
+```js
+let s = Symbol();
+
+typeof s    // "symbol"
+```
+
+2. 注意，`Symbol` 函数的参数只是表示对当前 Symbol 值的描述，因此相同参数的 Symbol 函数
+的返回值是不等的。
+3. Symbol 值不能与其他类型的值进行运算，会报错。必须显示转换为字符串或者布尔值，但不能
+转换为数值。`String(s), Boolean(s), !s,  s.toString()`
+那奇怪了，既然有 `toSting()` 方法为何不能参加普通运算呢。
+4. Symbol 作为属性名，不会出现在 `for...in, for...of` 循环中，也不会被 `Object.keys()`
+`Object.getOwnPropertyNames(), JSON.stringify()` 返回。`Object.getOwnPropertySymbols()`
+可以获取指定对象的所有 Symbol 属性名。返回一个数组。`Reflect.ownKeys()` 可以返回所有类型
+的键名，包含常规键名和 Symbol 键名。
+5. `Symbol.for()`, `Symbol.keyFor()`
+6. `Set` 本身是一个构造函数。接受可迭代结构做参数。
+7. Set 实例属性，`size`, 方法 `add(value), delete(value), has(value), clear()`
+add 返回 Set 结构，clear 没有返回值。
+8. Set 的遍历方法，`keys(), values(), entries(), forEach()`, Set 迭代遍历顺序就是
+插入顺序。   
+
+```js
+let set = new Set(["red", "green", "blue"]);
+
+for (let item of set.entries()) {
+  console.log(item);
+}
+// ["red", "red"]
+// ["green", "green"]
+// ["blue", "blue"]
+```   
+
+Set 结构的实例默认可遍历，它的默认遍历器生成函数就是它的 values 方法，因此可以直接用 for..of
+遍历 Set。    
+
+9. `WeakSet()` 是一个构造函数，可以使用 new 命令。三个实例方法 `add, delete, has`，没有
+size 属性。
+10. 作为构造函数，Map 也可以接受一个数组作为参数，该数组的成员是一个个表示键值对的数组。事实上，
+任何具有 Iterator 接口，且每个成员都是一个双元素的数组的数据结构都能用作参数。
+11. Map 的键将 NaN 看做与自身相等。
+12. Map 的实例属性和方法 `size, set(key, value), get(key), has(key), delete(key)`
+`clear(), keys(), values(), entries(), forEach()`
+13. `var proxy = new Proxy(target, handler)` 注意，要使得 `Proxy` 起作用，必须针对
+`Proxy` 实例进行操作，而不是针对源对象进行操作。
+14. Proxy 支持的拦截操作（receiver 好像就是 proxy 自身）：
+  - `get(target, propKey, receiver)` 属性读
+  - `set(target, propKey, value, receiver)` 设置属性，返回一个布尔值（What？）
+  - `has(target, propKey)` 拦截 `propKey in proxy` 返回一个布尔值，只拦截这一种吗？需要
+  测试一下
+  - `deleteProperty(target, propKey)`, 拦截 delelte 操作，返回一个布尔值
+  - `ownKeys(target)`，拦截 `Object.getOwnPropertyNames(proxy), Object.getOwnProperySymbols(proxy)`
+  `Object.keys(proxy), for...in` 循环，返回一个数组
+  - `getOwnPropertyDescriptor(target, propKey)`，返回属性描述符
+  - `defineProperty(target, propKey, descriptor)` 返回布尔值，包括 `defineProperties()`
+  方法，那问题就来啦，如果是 `defineProperties` 方法，参数是怎样的。
+  - `preventExtensions(target)` 返回布尔值
+  - `getPrototypeOf(target)` 返回对象
+  - `isExtensible(target)` 布尔
+  - `setPrototypeOf(target, proto)` 布尔
+  - 如果原对象是函数，还有额外两种操作可以拦截：
+  - `apply(target, object, args)` 拦截 Proxy 实例作为函数调用的操作，比如 `proxy(...args)`
+  `proxy.call(object, ...args), proxy.apply(object, args)`
+  - `constructor(target, args)`。
+15. Reflect 上的静态方法基本对应 Proxy, receiver 主要是用来在 setter 和 getter 中绑定
+到 this。   
+
+```js
+var myObject = {
+  foo: 1,
+  bar: 2,
+  get baz() {
+    return this.foo + this.bar;
+  },
+};
+
+var myReceiverObject = {
+  foo: 4,
+  bar: 4,
+};
+
+Reflect.get(myObject, 'baz', myReceiverObject) // 8
+```   
+
+貌似所有 Reflect 上的方法如果 target 不是对象，就抛出错误了，不会进行多余的转换，而 Object
+上的方法可能还会进行隐式的转换。    
+
+16. 注意，调用 resolve 或 reject 并不会终结 Promise 的参数函数的执行，也即是说没有 return
+效果咯。   
+
+```js
+new Promise((resolve, reject) => {
+  resolve(1);
+  console.log(2);
+}).then(r => {
+  console.log(r);
+});
+// 2
+// 1
+```   
+
+17. 如果 Promise 状态已经变成 resolved，再抛出错误是无效的。    
+
+```js
+const promise = new Promise(function(resolve, reject) {
+  resolve('ok');
+  throw new Error('test');
+});
+
+promise.then(value => {
+  console.log(value);
+}).catch(err => {
+  console.log(err);
+});
+// ok
+```    
+
+上面代码中，Promise 在 `resolve` 语句后面，再抛出错误，不会被捕获，等于没有抛出。因为
+Promise 的状态一旦改变，就永久保持该状态，不会再变了。   
+
+18. `Promise.prototype.finally()`，`finally` 方法的回调函数不接受任何参数。
+19. `Promise.all()`, Iterator 接口，Promise 实例
+20. `Promise.race()`
+
+### Iterator, Generator, async
+
+1. 每一次调用 `next` 方法，都会返回数据结构的当前成员的信息。具体来说，就是返回一个包含
+`value` 和 `done` 两个属性的对象。其中，`value` 属性是当前成员的值，`done` 属性是一个
+布尔值，表示遍历是否结束。
+2. ES6 规定，默认的 Iterator 接口部署在数据结构的 `Symbol.iterator` 属性。原生具备
+Iterator 接口的数据结构如下：
+  - Array
+  - Map
+  - Set
+  - String
+  - TypedArray
+  - Arguments 对象实例
+  - NodeList 对象实例
+3. 调用 Iterator 的场合：
+  - `for...of` 循环
+  - 解构赋值
+  - 扩展运算符
+  - `yield*`
+  - `Array.from()`
+  - `Map(), Set(), WeakMap(), WeakSet()`
+  - `Promise.race(), Promise.all()`
+4. 遍历器对象的 `return(), throw()` 方法。
+5. `function` 关键字和函数名之间有一个星号。`yield` 表达式是暂停标志。
+6. `yield` 表达式如果用在另一个表达式之中，必须放在圆括号里。
+7. yield 表达式本身没有返回值，或者说总是返回 `undefined`。`next` 方法可以带一个参数，
+该参数就会被当做上一个 yield 表达式的返回值。
+8. for...of 循环一旦遍历到返回对象 `done: true` 时就会终止，且不包含该对象。因此，return
+语句的值通常不会遍历到。其他利用迭代器接口的地方也是。
+9. `throw` 方法抛出的错误要被内部捕获，前提是必须至少执行过一次 `next` 方法。`throw` 方法
+被捕获之后，会附带执行下一条 `yield` 表达式。也就是说，会附带执行一次 `next` 方法。
+10. `Generator.prototype.return()`。如果 Generator 函数内部有 try...finally 代码块，
+那么 `return()` 方法会推迟到 `finally` 代码块执行完再执行。
+11. `yield*` 可迭代结构，如果被代理的 Generator 函数有 return 语句，那么就可以向代理它
+的 Generator 函数返回数据：    
+
+```js
+function* foo() {
+  yield 2;
+  yield 3;
+  return 'foo';
+}
+
+function* bar() {
+  yield 1;
+  var v = yield* foo();
+  console.log("v: " + v);
+  yield 4;
+}
+
+var it = bar();
+
+it.next();
+// { value: 1, done: false }
+it.next();
+// { value: 2, done: false }
+it.next()
+// { value: 3, done: false }
+it.next()
+// "v: foo"
+// { value: 4, done: false }
+it.next()
+// { value: undefined, done: true }
+```   
+
+12. 正常情况下，`await` 命令后面是一个 Promise 对象，如果不是就返回对应的值。
+
+### Class, Decorator, Module
+
+1. 类的内部所有定义的方法，都是不可枚举的。
+2. 类和模块的内部，默认就是严格模式。
+3. 类必须使用 `new` 调用，否则会报错。这是它和普通构造函数的一个主要区别。
+4. 与函数一样，类也可以使用表达式的形式定义。   
+
+```js
+const MyClass = class Me {
+  getClassName() {
+    return Me.name;
+  }
+};
+```    
+
+采用 Class 表达式，可以写出立即执行的 Class：   
+
+```js
+let person = new class {
+  constructor(name) {
+    this.name = name;
+  }
+
+  sayName() {
+    console.log(this.name);
+  }
+}('张三');
+```   
+
+5. 类不存在变量提升。
+6. 如果在一个方法前，加上 `static` 关键字，就表示该方法不会被实例继承，而是直接通过类来
+调用，这就称为“静态方法”。父类的静态方法，可以被子类继承。
+7. 类的实例属性可以用等式，写入类的定义之中。类的静态属性只要在实例属性写法前面，加上 `static`
+关键字即可。
+8. `new.target` 一般用在构造函数之中，返回 `new` 命令作用于的那个构造函数。如果构造函数
+不是通过 `new` 命令调用的。`new.target` 会返回 `undefined`。
+9. 子类必须在 `constructor` 方法中调用 `super` 方法，否则新建实例时会报错。如果子类没有定义
+`constructor` 方法，这个方法会被默认添加，代码如下。也就是说，不管有没有显示定义，任何一个
+子类都有 `constructor` 方法。   
+
+```js
+class ColorPoint extends Point {
+}
+
+// 等同于
+
+class ColorPoint extends Point {
+  constructor(...args) {
+    super(...args);
+  }
+}
+```   
+
+10. `Object.getPrototypeOf()` 方法可以用来从子类上获取父类。`Object.getPrototypeOf(ColorPoint) === Point // true`    
+11. 修饰器对类的行为的改变，是代码编译时发生的，而不是在运行时。
+12. 方法修饰器可以接受三个参数：   
+
+```js
+function readonly(target, name, descriptor) {
+  descriptor.writable = false;
+  return descriptor
+}
+```    
+
+第一个参数是类的原型对象，第二个参数是要修饰的属性名，第三个参数是该属性的描述符。    
+
+13. ES6 模块不是对象，而是通过 `export` 命令显示指定输出的代码，再通过 `import` 命令输入。
+14. 通常情况下，`export` 输出的变量就是本来的名字，但是可以使用 `as` 关键字重命名：   
+
+```js
+function v1() { ... }
+function v2() { ... }
+
+export {
+  v1 as streamV1,
+  v2 as streamV2,
+  v2 as streamLatestVersion
+};
+```    
+
+15. `import` 命令输入的变量都是只读的，因为它的本质是输入接口，也就说，不允许在加载模块的
+脚本里面，改写接口。   
+16. 由于 `import` 是静态执行，所以不能使用表达式和变量。`import` 语句会执行所加载的模块。
+17. 加载默认接口，指定加载接口，整体加载。
+18. 正是因为 `export default` 命令其实是输出一个叫做 `default` 的变量，所以它后面不能
+跟变量声明语句。    
+
+```js
+// 正确
+export var a = 1;
+
+// 正确
+var a = 1;
+export default a;
+
+// 错误
+export default var a = 1;
+```    
+
+同样地，因为 `export default` 命令的本质是将后面的值，赋给 `default` 变量，所以可以直接将
+一个值写在 `export default` 之后。   
+
+```js
+// 正确
+export default 42;
+
+// 报错
+export 42;
+```   
+
+19. `import()` 加载模块成功以后，这个模块会作为一个对象，当作 `then` 方法的参数。
+20. 浏览器对于带有 `type="module"` 的 `<script>`，都是异步加载，不会造成阻塞浏览器，等同
+于开启了 `defer` 属性。
+21. Node 要求 ES6 模块采用 `.mjs` 后缀文件名，也就是说，只要脚本文件里面使用 `import` 或者
+`export` 命令，那么就必须采用 `.mjs` 后缀名。`require` 命令不能加载 `.mjs` 文件，只有
+`import` 命令才可以加载 `.mjs` 文件。反过来，`.mjs` 文件里面也不能使用 `require` 命令，
+必须使用 `import`。    
+22. Node 规定 ES6 模块之中不能使用 CJS 模块特有的一些内部变量，以下顶层变量在 ES6 模块之中
+是不存在的：   
+  - `arguments`
+  - `require`
+  - `module`
+  - `exports`
+  - `__filename`
+  - `__dirname`    
+23. CJS 模块的输出都定义在 `module.exports` 这个属性上面。Node 的 `import` 命令加载
+CJS 模块，Node 会自动将 `module.exports` 属性，当作模块的默认输出。   
+24. 由于 ES6 模块是编译时确定输出接口，CJS 模块是运行时确定输出接口，所以采用 import 命令
+加载 CJS 模块时，不允许采用下面的写法 `import { readFile } from 'fs'`。因为，fs 是
+CJS 格式，只有在运行时才能确定 `readFile` 接口，而 `import` 命令要求编译时就确定这个接口。
+25. CJS 模块加载 ES6 模块，不能使用 `require` 命令，而要使用 `import()` 函数。ES6 模块
+的所有输出接口，会成为输入对象的属性。
